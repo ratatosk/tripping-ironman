@@ -1,0 +1,14 @@
+name:                tripping-ironman
+version:             0.1.0.0
+synopsis:            Music arvhive unpacker
+homepage:            https://github.com/ratatosk/tripping-ironman
+license:             BSD3
+license-file:        LICENSE
+author:              Paul Graphov
+maintainer:          graphov@gmail.com
+category:            Sound
+build-type:          Simple
+cabal-version:       >=1.8
+
+executable tripping-ironman
+  build-depends:       base ==4.5.*
