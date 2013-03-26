@@ -14,7 +14,9 @@ executable tripping-ironman
   build-depends:
     base ==4.5.*,
     unix,
-    directory,
+    text,
+    system-fileio,
+    system-filepath,
     process
     
   main-is: Main.hs
