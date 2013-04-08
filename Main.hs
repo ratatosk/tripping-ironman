@@ -7,8 +7,12 @@ import Prelude hiding (FilePath)
 import Control.Applicative
 import Control.Monad
 import Control.Exception
+import Control.Conditional (ifM)
 
 import Data.String (fromString)
+
+import Data.Trees.MTree
+import Data.Bitraversable
 
 import qualified Data.Text as T
 import qualified Data.Text.IO as T
@@ -20,6 +24,9 @@ import System.Cmd
 import Filesystem
 import Filesystem.Path
 import Filesystem.Path.CurrentOS
+
+import ID3.Type.Tag
+import ID3.ReadTag
 
 import System.Posix.Process
 
@@ -45,6 +52,21 @@ mkTempDir = do
   createDirectory False tmp
   return tmp
 
+-- readTag sucks because of weird dependencies
+tryReadTag :: FilePath -> IO (Maybe ID3Tag)
+tryReadTag f = withFile f ReadMode hReadTag
+
+
+data Track = Track { artist :: Maybe T.Text
+                   , album :: Maybe T.Text
+                   , title :: Maybe T.Text
+                   } deriving (Show)
+
+readTree :: FilePath -> IO (Tree FilePath FilePath)
+readTree p = liftM (Node p) $ listDirectory p >>= mapM readChild
+  where
+    readChild c = ifM (isDirectory c) (readTree c) (return $ Leaf c c)    
+
 --        file       temp
 process :: FilePath -> FilePath -> IO ()
 process file dir = do
@@ -52,6 +74,7 @@ process file dir = do
   putStrLn $ "File: " ++ encodeString file
   isFile file >>= flip unless (error "No such file")
   unpack file dir >>= \ec -> unless (ec == ExitSuccess) (error "Unpack failed")
+  readTree dir >>= bitraverse return tryReadTag >>= print
 
 main :: IO ()
 main = do

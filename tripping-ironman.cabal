@@ -17,6 +17,10 @@ executable tripping-ironman
     text,
     system-fileio,
     system-filepath,
-    process
+    process,
+    idiii,
+    cond,
+    bifunctors,
+    mtree
     
   main-is: Main.hs
